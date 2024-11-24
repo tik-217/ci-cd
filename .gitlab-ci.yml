@@ -1,8 +1,10 @@
 stages:
   - install deps
   - build
+  - build_docker
+  - deploy
 
-install:
+Install:
   stage: install deps
   image: node:22
   script: 
@@ -13,7 +15,7 @@ install:
    paths: 
     - "./node_modules"
 
-build:
+Build:
   stage: build
   image: node:22
   script: 
@@ -23,3 +25,27 @@ build:
    key: $CI_COMMIT_REF_SLUG
    paths:
      - "./node_modules"
+
+Build_docker:
+  stage: build_docker
+  image: docker
+  services:
+    - docker:dind
+  variables:
+    IMAGE_NAME: tik217/new-express-app
+  script:
+   - docker login -u tik-217 -p ${DOCKER_PWD} .
+   - docker build -f frontend.Dockerfile -t ${IMAGE_NAME}
+   - docker push ${IMAGE_NAME}
+
+Deploy:
+  stage: deploy
+  image: ringcentral/sshpass
+  script:
+   - sshpass ssh ${SSH_HOST} -p ${SSH_PASS} "
+     cd snap
+     git pull
+     docker compose pull nginx
+     docker compose stop nginx
+     docker compose up -d nginx
+    "
