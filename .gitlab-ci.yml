@@ -1,14 +1,25 @@
-version: '3.7'
+stages:
+  - install deps
+  - build
 
-services:
-  environment:
-    container_name: Environment
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - 3005:3005
-    stdin_open: true
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    command: node app.js
+install:
+  stage: install deps
+  image: node:22
+  script: 
+   - npm install
+  cache: 
+   policy: push
+   key: $CI_COMMIT_REF_SLUG
+   paths: 
+    - "./node_modules"
+
+build:
+  stage: build
+  image: node:22
+  script: 
+   - "node app.js"
+  cache:
+   policy: pull
+   key: $CI_COMMIT_REF_SLUG
+   paths:
+     - "./node_modules"
