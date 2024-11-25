@@ -6,18 +6,19 @@ Install:
   stage: install
   image: node:18
   script:
+    - cd frontend
     - npm install
   cache:
     policy: push
     key: $CI_COMMIT_REF_SLUG
     paths:
       - "frontend/node_modules"
-    
 
 Build:
   stage: build
   image: node:18
   script:
+   - cd frontend
    - npm run build
   cache:
     policy: pull
