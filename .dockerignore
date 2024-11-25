@@ -4,6 +4,8 @@ app/dist/
 
 docker-compose.yml
 
+docker-command
+
 Dockerfile
 
 .gitignore
