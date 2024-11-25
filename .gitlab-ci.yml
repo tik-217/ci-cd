@@ -30,6 +30,7 @@ Build:
 
 Docker_build:
   stage: docker_build
+  image: docker
   services:
     - docker:dind
   variables:
