@@ -12,7 +12,7 @@ Install:
     - npm install
   cache:
     policy: push
-    key: $CI_COMMIT_REF_SLUG
+    key: ${CI_COMMIT_REF_SLUG}-modules
     paths:
       - "frontend/node_modules"
 
@@ -23,10 +23,14 @@ Build:
     - cd frontend
     - npm run build
   cache:
-    policy: pull
-    key: $CI_COMMIT_REF_SLUG
-    paths:
-      - "frontend/node_modules"
+    - key: ${CI_COMMIT_REF_SLUG}-modules
+      policy: pull
+      paths:
+        - "frontend/node_modules"
+    - key:  ${CI_COMMIT_REF_SLUG}-build
+      policy: push
+      paths:
+        - "frontend/build"
 
 Docker_build:
   stage: docker_build
@@ -39,15 +43,20 @@ Docker_build:
     - docker login -u tik217 -p ${DOCKER_PWD}
     - docker build -f frontend.Dockerfile -t ${IMAGE_NAME} .
     - docker push ${IMAGE_NAME}
+  cache:
+    key:  ${CI_COMMIT_REF_SLUG}-build
+    policy: pull
+    paths:
+      - "frontend/build"
 
 Deploy:
   stage: deploy
   image: ringcentral/sshpass
   script:
-   - sshpass ssh ${SSH_HOST} -p ${SSH_PASS} "\
-    cd ci-cd
-    git pull
-    docker compose pull nginx
-    docker compose stop nginx
-    docker compose up -d nginx
+   - sshpass -p ${SSH_PASS} ssh ${SSH_HOST} "\
+      cd ci-cd &&
+      git pull &&
+      docker compose pull nginx &&
+      docker compose stop nginx &&
+      docker compose up -d nginx
     "
