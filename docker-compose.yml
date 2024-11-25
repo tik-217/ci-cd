@@ -4,7 +4,7 @@ services:
   environment:
     build:
       context: .
-      dockerfile: frontend.dockerfile
+      dockerfile: frontend.Dockerfile
     ports:
       - 3005:3005
     environment:
