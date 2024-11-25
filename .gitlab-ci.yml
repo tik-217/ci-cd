@@ -53,7 +53,7 @@ Deploy:
   stage: deploy
   image: ringcentral/sshpass
   script:
-   - sshpass -p ${SSH_PASS} ssh ${SSH_HOST} "\
+   - sshpass -p ${SSH_PASS} ssh ${SSH_HOST} -o stricthostkeychecking=no "\
       cd ci-cd &&
       git pull &&
       docker compose pull nginx &&
